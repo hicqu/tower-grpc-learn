@@ -27,7 +27,7 @@ use helloworld::HelloRequest;
 pub fn main() {
     env_logger::init();
 
-    let uri: http::Uri = format!("http://[::1]:50051").parse().unwrap();
+    let uri: http::Uri = format!("http://[::1]:44444").parse().unwrap();
     let dst = Destination::try_from_uri(uri.clone()).unwrap();
     let connector = Connector::new(HttpConnector::new(1)); // 1 thread for DNS.
     let settings = ClientBuilder::new().http2_only(true).clone();
@@ -109,15 +109,15 @@ where
         .map_err(|e| println!("poll the client fail: {:?}", e))
         .map(move |mut client| {
             let name = "Client".to_owned();
-            let s = stream::iter_ok::<_, Status>(iter::repeat(new_request(name)));
-            // let s = stream::iter_ok::<_, Status>(iter::repeat(new_request(name)).take(100));
+            // let s = stream::iter_ok::<_, Status>(iter::repeat(new_request(name)));
+            let s = stream::iter_ok::<_, Status>(iter::repeat(new_request(name)).take(100));
             executor.spawn(
                 client
                     .b_stream_say_hello(Request::new(s))
                     .and_then(|s| {
                         s.into_inner()
-                            // .map(|resp| println!("RESPONSE = {:?}", resp))
-                            .map(|_resp| ())
+                            .map(|resp| println!("RESPONSE = {:?}", resp))
+                            // .map(|_resp| ())
                             .fold(0, |count, _| future::ok::<_, Status>(count + 1))
                             .map(|count| println!("All {} responses are received", count))
                     })

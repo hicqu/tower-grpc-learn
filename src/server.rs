@@ -138,7 +138,7 @@ pub fn main() {
         .build()
         .unwrap();
 
-    let addr = "[::1]:50051".parse().unwrap();
+    let addr = "[::1]:44444".parse().unwrap();
     let bind = TcpListener::bind(&addr).expect("bind");
     let mut server = Server::new(GreeterServer::new(Greet {
         exec: background_runtime.executor(),
